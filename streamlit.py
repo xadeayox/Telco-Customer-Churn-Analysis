@@ -129,18 +129,25 @@ shap_values = explainer.shap_values(X)
 st.write("Top factors contributing to churn:")
 
 # SHAP summary plot
-import matplotlib.pyplot as plt
 import shap
+import streamlit as st
+import plotly.express as px
 
-fig, ax = plt.subplots()
-shap.summary_plot(shap_values, X, plot_type="bar", show=False)
+explainer = shap.TreeExplainer(model)
+shap_values = explainer(X)
 
-# Save figure
-fig.savefig("shap_plot.png")
+# Mean |SHAP| values (feature importance)
+importances = np.abs(shap_values.values).mean(axis=0)
+feature_names = X.columns
 
-# Display in Streamlit
-st.image("shap_plot.png")
+fig = px.bar(
+    x=importances,
+    y=feature_names,
+    orientation='h',
+    title="Feature Importance (SHAP Values)"
+)
 
+st.plotly_chart(fig)
 
 
 
